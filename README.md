@@ -69,9 +69,10 @@ docker-compose --profile development up -d
 - **API**: 連接後端API服務
 
 ### rule_alpha_server
-- **技術**: Python 3.9 + FastAPI
-- **功能**: 規則引擎, MQTT通信, 專案管理
+- **技術**: Python 3.10 + AsyncIO
+- **功能**: 規則引擎, MQTT通信, 專案管理, 數據處理
 - **依賴**: MariaDB, MQTT Broker
+- **狀態**: ✅ 運行中，已修復MQTT連接和數據庫集成
 
 ### rule_alpha_shared
 - **功能**: 共享監控組件, 工具函數
@@ -106,10 +107,15 @@ python main.py
 
 | 變數 | 說明 | 範例 |
 |------|------|------|
-| `DOMAIN_SUFFIX` | 主域名 | `example.com` |
-| `LETSENCRYPT_EMAIL` | SSL憑證申請郵箱 | `admin@example.com` |
-| `RULE_ALPHA_DB_*` | 數據庫連接配置 | - |
-| `JWT_SECRET` | JWT簽名密鑰 | `your_secret_key` |
+| `DOMAIN_SUFFIX` | 主域名 | `cocaen.com` |
+| `LETSENCRYPT_EMAIL` | SSL憑證申請郵箱 | `arch.twn1@gmail.com` |
+| `RULE_ALPHA_DB_NAME` | 數據庫名稱 | `rule_alpha` |
+| `RULE_ALPHA_DB_USER` | 數據庫用戶 | `pma` |
+| `RULE_ALPHA_DB_PASSWORD` | 數據庫密碼 | `****` |
+| `MQTT_USERNAME` | MQTT用戶名 | `cocaen` |
+| `MQTT_PASSWORD` | MQTT密碼 | `****` |
+| `JWT_SECRET` | JWT簽名密鑰 | `keybyarchcocaen` |
+| `API_BEARER_TOKEN` | API Bearer Token | `****` |
 
 ## 🔐 安全配置
 
@@ -129,8 +135,23 @@ docker-compose ps
 docker-compose logs -f [service_name]
 
 # 健康檢查
-curl https://rule-alpha-api.{DOMAIN_SUFFIX}/api/health
+curl https://rule-alpha-api.cocaen.com/api/health
+
+# 查看特定服務日誌
+docker-compose logs -f rule_alpha_server
+docker-compose logs -f rule_alpha_backend
+docker-compose logs -f rule_alpha_frontend
 ```
+
+## 🔄 部署狀態
+
+### 當前版本：v1.0.0 (2025-07-14)
+- ✅ rule_alpha_backend: 運行中
+- ✅ rule_alpha_frontend: 運行中  
+- ✅ rule_alpha_server: 運行中，已修復MQTT連接問題
+- ✅ 數據庫集成: 正常
+- ✅ MQTT通信: 正常
+- ✅ SSL憑證: 自動更新
 
 ## 🐛 故障排除
 
