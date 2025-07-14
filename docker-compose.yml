@@ -1,0 +1,112 @@
+version: '3.8'
+
+networks:
+  cocaen-net:
+    external: true
+
+services:
+  rule_alpha_backend:
+    build: 
+      context: ./rule_alpha_backend
+      dockerfile: Dockerfile
+    container_name: rule-alpha-backend
+    restart: always
+    environment:
+      - VIRTUAL_HOST=rule-alpha-api.${DOMAIN_SUFFIX}
+      - LETSENCRYPT_HOST=rule-alpha-api.${DOMAIN_SUFFIX}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - DB_HOST=mariadb
+      - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
+      - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
+      - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - cocaen-net
+    depends_on:
+      - rule_alpha_frontend
+    profiles: ["production"]
+
+  rule_alpha_frontend:
+    build:
+      context: ./rule_alpha_frontend
+      dockerfile: Dockerfile
+    container_name: rule-alpha-frontend
+    restart: always
+    environment:
+      - VIRTUAL_HOST=rule-alpha.${DOMAIN_SUFFIX}
+      - LETSENCRYPT_HOST=rule-alpha.${DOMAIN_SUFFIX}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - VITE_API_BASE_URL=https://rule-alpha-api.${DOMAIN_SUFFIX}
+    networks:
+      - cocaen-net
+    profiles: ["production"]
+
+  rule_alpha_server:
+    build:
+      context: ./rule_alpha_server
+      dockerfile: Dockerfile
+    container_name: rule-alpha-server
+    restart: always
+    environment:
+      - VIRTUAL_HOST=rule-alpha-engine.${DOMAIN_SUFFIX}
+      - LETSENCRYPT_HOST=rule-alpha-engine.${DOMAIN_SUFFIX}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - DB_HOST=mariadb
+      - DB_NAME=${RULE_ALPHA_DB_NAME:-rule_alpha}
+      - DB_USER=${RULE_ALPHA_DB_USER:-rule_alpha_user}
+      - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+      - API_BASE_URL=https://rule-alpha-api.${DOMAIN_SUFFIX}
+    networks:
+      - cocaen-net
+    depends_on:
+      - rule_alpha_backend
+    profiles: ["production"]
+
+  # 開發環境服務 (不使用外部代理)
+  rule_alpha_backend_dev:
+    build: 
+      context: ./rule_alpha_backend
+      dockerfile: Dockerfile
+    container_name: rule-alpha-backend-dev
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      - DB_HOST=localhost
+      - DB_NAME=rule_alpha_dev
+      - DB_USER=root
+      - DB_PASSWORD=
+      - JWT_SECRET=dev_secret_key
+    profiles: ["development"]
+
+  rule_alpha_frontend_dev:
+    build:
+      context: ./rule_alpha_frontend
+      dockerfile: Dockerfile
+    container_name: rule-alpha-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    profiles: ["development"]
+
+  rule_alpha_server_dev:
+    build:
+      context: ./rule_alpha_server
+      dockerfile: Dockerfile
+    container_name: rule-alpha-server-dev
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    environment:
+      - DB_HOST=localhost
+      - DB_NAME=rule_alpha_dev
+      - DB_USER=root
+      - DB_PASSWORD=
+      - MQTT_BROKER=localhost
+      - MQTT_PORT=1883
+      - API_BASE_URL=http://localhost:8000
+    profiles: ["development"]
