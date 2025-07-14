@@ -1,0 +1,12 @@
+[submodule "rule_alpha_backend"]
+	path = rule_alpha_backend
+	url = https://github.com/ArchTW/rule_alpha_backend.git
+[submodule "rule_alpha_frontend"]
+	path = rule_alpha_frontend
+	url = https://github.com/ArchTW/rule_alpha_frontend.git
+[submodule "rule_alpha_server"]
+	path = rule_alpha_server
+	url = https://github.com/ArchTW/rule_alpha_server.git
+[submodule "rule_alpha_shared"]
+	path = rule_alpha_shared
+	url = https://github.com/ArchTW/rule_alpha_shared.git

@@ -1,7 +1,7 @@
 version: '3.8'
 
 networks:
-  rule-alpha-net:
+  cocaen-net:
     external: true
 
 services:
@@ -21,7 +21,7 @@ services:
       - DB_PASSWORD=${RULE_ALPHA_DB_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     depends_on:
       - rule_alpha_frontend
     profiles: ["production"]
@@ -38,7 +38,7 @@ services:
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
       - VITE_API_BASE_URL=https://rule-alpha-api.${DOMAIN_SUFFIX}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     profiles: ["production"]
 
   rule_alpha_server:
@@ -59,7 +59,7 @@ services:
       - MQTT_PORT=1883
       - API_BASE_URL=https://rule-alpha-api.${DOMAIN_SUFFIX}
     networks:
-      - rule-alpha-net
+      - cocaen-net
     depends_on:
       - rule_alpha_backend
     profiles: ["production"]
